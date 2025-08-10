@@ -1,0 +1,46 @@
+---
+- name: Configure My CLI Environment
+  hosts: localhost
+  connection: local
+  become: yes
+
+  vars:
+    # --- Your customized list of CLI tools ---
+    cli_tools:
+      - git
+      - curl
+      - htop
+      - fzf
+      - bat
+      - ripgrep
+      - fd-find  # Provides the 'fdfind' command
+      - zoxide
+
+  tasks:
+    - name: Update apt cache and install common CLI tools
+      ansible.builtin.apt:
+        name: "{{ cli_tools }}"
+        state: present
+        update_cache: yes
+      tags:
+        - packages
+
+    - name: Install oh-my-posh
+      ansible.builtin.shell:
+        cmd: curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
+        creates: /usr/local/bin/oh-my-posh # This makes the task idempotent
+      tags:
+        - packages
+
+    - name: Append .bashextension content to .bashrc
+      become: no # This task should run as the user, not root
+      ansible.builtin.blockinfile:
+        path: "{{ ansible_user_dir }}/.bashrc"
+        block: "{{ lookup('file', playbook_dir + '/.bashextension') }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK - BASH EXTENSIONS"
+        create: yes
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+        mode: '0644'
+      tags:
+        - dotfiles
