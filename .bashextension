@@ -21,5 +21,5 @@ export PATH="$PATH:$HOME/.local/bin"
 
 # Initialize Oh My Posh with a custom theme
 # This assumes your custom theme will be located at ~/.leonardo/ohmyposh/
-eval "$(oh-my-posh init bash --config ~/.leonardo/ohmyposh/nordcustom.omp.json)"
+eval "$(oh-my-posh init bash --config ~/.leonardo/ohmyposh/pure.omp.json)"
 
