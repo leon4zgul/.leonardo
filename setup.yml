@@ -32,22 +32,22 @@
       tags:
         - packages
 
-    - name: Copy .bashextension file to the user's home directory
-      become: no # This task runs as the user, not root
-      ansible.builtin.copy:
-        src: "{{ playbook_dir }}/.bashextension"
-        dest: "{{ lookup('env', 'HOME') }}/.bashextension"
-        owner: "{{ lookup('env', 'USER') }}"
-        group: "{{ lookup('env', 'USER') }}"
-        mode: '0644'
-      tags:
-        - dotfiles
+          # - name: Copy .bashextension file to the user's home directory
+          #   become: no # This task runs as the user, not root
+          #   ansible.builtin.copy:
+          #     src: "{{ playbook_dir }}/.bashextension"
+          #     dest: "{{ lookup('env', 'HOME') }}/.bashextension"
+          #     owner: "{{ lookup('env', 'USER') }}"
+          #     group: "{{ lookup('env', 'USER') }}"
+          #     mode: '0644'
+          #   tags:
+          #     - dotfiles
 
     - name: Ensure .bashrc sources the .bashextension file
       become: no # This task also runs as the user
       ansible.builtin.lineinfile:
         path: "{{ lookup('env', 'HOME') }}/.bashrc"
-        line: '[ -f ~/.bashextension ] && source ~/.bashextension'
+        line: '[ -f ~/.leonardo/.bashextension ] && source ~/.leonardo/.bashextension'
         state: present
         create: yes
         owner: "{{ lookup('env', 'USER') }}"
