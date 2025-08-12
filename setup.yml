@@ -5,23 +5,55 @@
   become: yes
 
   vars:
-    # --- Your customized list of CLI tools ---
-    cli_tools:
+    # --- Customized list of CLI tools ---
+    # We define separate lists because package names can differ.
+    # For example, 'bat' on Fedora is 'batcat' on older Debian/Ubuntu.
+    redhat_packages:
       - git
       - curl
       - htop
       - fzf
-      - bat
+      - bat        # Package is 'bat' on Fedora/RHEL
       - ripgrep
-      - fd-find  # Provides the 'fdfind' command
+      - fd-find
+      - zoxide
+
+    debian_packages:
+      - git
+      - curl
+      - htop
+      - fzf
+      - bat     # Package is 'batcat' on Debian/Ubuntu
+      - ripgrep
+      - fd-find
       - zoxide
 
   tasks:
-    - name: Update apt cache and install common CLI tools
+    - name: Install common CLI tools (for Debian-based systems)
       ansible.builtin.apt:
-        name: "{{ cli_tools }}"
+        name: "{{ debian_packages }}"
         state: present
         update_cache: yes
+      when: ansible_os_family == "Debian"
+      tags:
+        - packages
+
+    - name: Install common CLI tools (for RedHat-based systems)
+      ansible.builtin.dnf:
+        name: "{{ redhat_packages }}"
+        state: present
+      when: ansible_os_family == "RedHat"
+      tags:
+        - packages
+    
+    # This task is a nice-to-have to make 'batcat' callable with 'bat'
+    - name: Create a symlink for batcat to be called as bat (on Debian)
+      ansible.builtin.file:
+        src: /usr/bin/batcat
+        dest: /usr/local/bin/bat
+        state: link
+        force: yes # Overwrite if a different file is there
+      when: ansible_os_family == "Debian"
       tags:
         - packages
 
@@ -32,19 +64,8 @@
       tags:
         - packages
 
-          # - name: Copy .bashextension file to the user's home directory
-          #   become: no # This task runs as the user, not root
-          #   ansible.builtin.copy:
-          #     src: "{{ playbook_dir }}/.bashextension"
-          #     dest: "{{ lookup('env', 'HOME') }}/.bashextension"
-          #     owner: "{{ lookup('env', 'USER') }}"
-          #     group: "{{ lookup('env', 'USER') }}"
-          #     mode: '0644'
-          #   tags:
-          #     - dotfiles
-
     - name: Ensure .bashrc sources the .bashextension file
-      become: no # This task also runs as the user
+      become: no # This task runs as the user
       ansible.builtin.lineinfile:
         path: "{{ lookup('env', 'HOME') }}/.bashrc"
         line: '[ -f ~/.leonardo/.bashextension ] && source ~/.leonardo/.bashextension'
@@ -55,4 +76,3 @@
         mode: '0644'
       tags:
         - dotfiles
-
