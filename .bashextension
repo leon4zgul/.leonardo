@@ -6,8 +6,8 @@ alias grep='rg'
 alias s='sudo'
 alias dcu='docker-compose up -d'
 alias dcd='docker-compose down'
-alias l=ls
-alias la=ls -lah
+alias l='ls'
+alias la='ls -lah'
 
 # --- FZF Configuration ---
 # Set up fzf to use fd for finding files
@@ -22,5 +22,5 @@ export PATH="$PATH:$HOME/.local/bin"
 
 # Initialize Oh My Posh with a custom theme
 # This assumes your custom theme will be located at ~/.leonardo/ohmyposh/
-eval "$(oh-my-posh init bash --config ~/.leonardo/ohmyposh/pure.omp.json)"
+eval "$(oh-my-posh init bash --config ~/.leonardo/ohmyposh/purecustom.omp.json)"
 eval "$(zoxide init bash)"
