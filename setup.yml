@@ -15,6 +15,7 @@
       - curl
       - htop
       - fzf
+      - neovim
       - bat
       - ripgrep
       - fd-find
@@ -26,6 +27,7 @@
       - curl
       - htop
       - fzf
+      - neovim
       - "{{ bat_package_name }}" # Use the dynamically set variable here
       - ripgrep
       - fd-find
