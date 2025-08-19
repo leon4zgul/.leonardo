@@ -6,27 +6,31 @@
 
   vars:
     # --- Customized list of CLI tools ---
-    # We define separate lists because package names can differ.
-    # For example, 'bat' on Fedora is 'batcat' on older Debian/Ubuntu.
+
+    # Use a conditional to set the correct package name for bat
+    bat_package_name: "{{ 'batcat' if ansible_distribution == 'Ubuntu' else 'bat' }}"
+
     redhat_packages:
       - git
       - curl
       - htop
       - fzf
-      - bat        # Package is 'bat' on Fedora/RHEL
+      - bat
       - ripgrep
       - fd-find
       - zoxide
+      - unzip
 
     debian_packages:
       - git
       - curl
       - htop
       - fzf
-      - bat     # Package is 'batcat' on Debian/Ubuntu
+      - "{{ bat_package_name }}" # Use the dynamically set variable here
       - ripgrep
       - fd-find
       - zoxide
+      - unzip
 
   tasks:
     - name: Install common CLI tools (for Debian-based systems)
@@ -45,34 +49,39 @@
       when: ansible_os_family == "RedHat"
       tags:
         - packages
-    
-    # This task is a nice-to-have to make 'batcat' callable with 'bat'
-    - name: Create a symlink for batcat to be called as bat (on Debian)
+
+    # This task now specifically targets Ubuntu, where the symlink is needed.
+    - name: Create a symlink for batcat to be called as bat (on Ubuntu)
       ansible.builtin.file:
         src: /usr/bin/batcat
         dest: /usr/local/bin/bat
         state: link
-        force: yes # Overwrite if a different file is there
-      when: ansible_os_family == "Debian"
+        force: yes
+      when: ansible_distribution == 'Ubuntu' # More specific check
       tags:
         - packages
 
     - name: Install oh-my-posh
       ansible.builtin.shell:
         cmd: curl -s https://ohmyposh.dev/install.sh | bash -s -- -d /usr/local/bin
-        creates: /usr/local/bin/oh-my-posh # This makes the task idempotent
+        creates: /usr/local/bin/oh-my-posh
       tags:
         - packages
 
-    - name: Ensure .bashrc sources the .bashextension file
-      become: no # This task runs as the user
-      ansible.builtin.lineinfile:
-        path: "{{ lookup('env', 'HOME') }}/.bashrc"
-        line: '[ -f ~/.leonardo/.bashextension ] && source ~/.leonardo/.bashextension'
-        state: present
-        create: yes
-        owner: "{{ lookup('env', 'USER') }}"
-        group: "{{ lookup('env', 'USER') }}"
-        mode: '0644'
+    # This block handles user-specific dotfile configurations
+    - name: Configure user's dotfiles
+      become: no
       tags:
         - dotfiles
+      block:
+        - name: Ensure .bashrc sources the .bashextension file
+          ansible.builtin.lineinfile:
+            # CORRECTED: Use a lookup to get the HOME env var at task execution time.
+            # This respects 'become: no' and gets the correct user's home directory.
+            path: "{{ lookup('env', 'HOME') }}/.bashrc"
+            line: '[ -f ~/.leonardo/.bashextension ] && source ~/.leonardo/.bashextension'
+            state: present
+            create: yes
+            mode: '0644'
+
+
