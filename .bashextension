@@ -10,6 +10,7 @@ alias l='ls'
 alias la='ls -lah'
 alias vim='nvim'
 alias less='less -FRSiX' 
+alias tmux='tmux -f ~/.leonardo/tmux.conf'
 
 # --- FZF Configuration ---
 # Set up fzf to use fd for finding files
