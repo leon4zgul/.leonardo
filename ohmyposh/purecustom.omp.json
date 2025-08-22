@@ -5,13 +5,13 @@
       "alignment": "left",
       "segments": [
         {
-          "foreground": "#bf616a",
+          "foreground": "#a3be8c",
           "style": "plain",
           "template": "{{ .UserName }}@{{ .HostName }} ",
           "type": "session"
         },
         {
-          "foreground": "#EBCB8B",
+          "foreground": "#b48ead",
           "properties": {
             "display_mode": "virtual",
             "fetch_version": false
@@ -36,7 +36,7 @@
       "alignment": "left",
       "segments": [
         {
-          "foreground": "#6C6C6C",
+          "foreground": "#88c0d0",
           "properties": {
             "branch_ahead_icon": "<#88C0D0>\u21e1 </>",
             "branch_behind_icon": "<#88C0D0>\u21e3 </>",
@@ -56,7 +56,7 @@
       "alignment": "left",
       "segments": [
         {
-          "foreground": "#A3BE8C",
+          "foreground": "#8fbcbb",
           "properties": {
             "style": "austin"
           },
@@ -72,7 +72,7 @@
       "newline": true,
       "segments": [
         {
-          "foreground": "#B48EAD",
+          "foreground": "#8fbcbb",
           "foreground_templates": [
             "{{ if gt .Code 0 }}#BF616A{{ end }}"
           ],
@@ -89,7 +89,7 @@
   ],
   "console_title_template": "{{if .Root}}(Admin){{end}} {{.PWD}}",
   "transient_prompt": {
-    "foreground": "#B48EAD",
+    "foreground": "#8fbcbb",
     "foreground_templates": [
       "{{ if gt .Code 0 }}#BF616A{{ end }}"
     ],
